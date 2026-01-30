@@ -454,7 +454,7 @@
                                                        Margin="0,12,0,0"/>
                                         </StackPanel>
 
-                                        <!-- Buttons (Show on hover) -->
+                                        <!-- Action Buttons (Show on hover) -->
                                         <StackPanel x:Name="ActionButtons"
                                                     Orientation="Horizontal"
                                                     HorizontalAlignment="Center"
@@ -484,14 +484,18 @@
                                                     </ControlTemplate>
                                                 </Button.Template>
                                             </Button>
-                                            
-                                            <!-- "Activo" Label - Shown when profile is active -->
-                                            <TextBlock Text="✓ Activo" 
-                                                       Foreground="#7F5AF0"
-                                                       FontWeight="SemiBold"
-                                                       FontSize="14"
-                                                       Visibility="{Binding IsActive, Converter={StaticResource BoolToVisibilityConverter}}"/>
                                         </StackPanel>
+
+                                        <!-- "Activo" Label - Always visible when active -->
+                                        <TextBlock Text="✓ Activo" 
+                                                   Foreground="#7F5AF0"
+                                                   FontWeight="SemiBold"
+                                                   FontSize="14"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Bottom"
+                                                   Margin="0,0,0,25"
+                                                   Visibility="{Binding IsActive, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
 
                                         <!-- Top Actions Stack (Edit + Delete) -->
                                         <StackPanel x:Name="TopActions"
