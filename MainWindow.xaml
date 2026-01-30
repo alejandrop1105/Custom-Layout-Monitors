@@ -173,21 +173,27 @@
             </Setter>
         </Style>
 
-        <!-- Floating Action Button Style -->
+        <!-- Floating Action Button Style with Animation -->
         <Style x:Key="AddProfileFAB" TargetType="Button">
-            <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
+            <Setter Property="Background" Value="{StaticResource LightPurpleBrush}"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Width" Value="44"/>
-            <Setter Property="Height" Value="44"/>
+            <Setter Property="Width" Value="48"/>
+            <Setter Property="Height" Value="48"/>
             <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                </Setter.Value>
+            </Setter>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Grid>
+                        <Grid RenderTransformOrigin="0.5,0.5">
                             <Ellipse x:Name="circle" Fill="{TemplateBinding Background}">
                                 <Ellipse.Effect>
-                                    <DropShadowEffect Color="{StaticResource PrimaryPurple}" 
+                                    <DropShadowEffect x:Name="shadow" Color="{StaticResource PrimaryPurple}" 
                                                     BlurRadius="15" 
                                                     ShadowDepth="0" 
                                                     Opacity="0.5"/>
@@ -195,16 +201,55 @@
                             </Ellipse>
                             <Path x:Name="icon"
                                   Data="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"
-                                  Fill="{StaticResource LightPurpleBrush}"
-                                  Width="14" Height="14"
+                                  Fill="White"
+                                  Width="16" Height="16"
                                   Stretch="Uniform"
                                   HorizontalAlignment="Center" 
-                                  VerticalAlignment="Center"/>
+                                  VerticalAlignment="Center"
+                                  RenderTransformOrigin="0.5,0.5">
+                                <Path.RenderTransform>
+                                    <RotateTransform x:Name="iconRotate" Angle="0"/>
+                                </Path.RenderTransform>
+                            </Path>
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="circle" Property="Fill" Value="{StaticResource LightPurpleBrush}"/>
-                                <Setter TargetName="icon" Property="Fill" Value="White"/>
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="iconRotate" 
+                                                           Storyboard.TargetProperty="Angle" 
+                                                           To="90" Duration="0:0:0.2"/>
+                                            <ColorAnimation Storyboard.TargetName="circle" 
+                                                          Storyboard.TargetProperty="(Ellipse.Fill).(SolidColorBrush.Color)" 
+                                                          To="#9333EA" Duration="0:0:0.2"/>
+                                            <DoubleAnimation Storyboard.TargetName="shadow" 
+                                                           Storyboard.TargetProperty="BlurRadius" 
+                                                           To="25" Duration="0:0:0.2"/>
+                                            <DoubleAnimation Storyboard.TargetName="shadow" 
+                                                           Storyboard.TargetProperty="Opacity" 
+                                                           To="0.8" Duration="0:0:0.2"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="iconRotate" 
+                                                           Storyboard.TargetProperty="Angle" 
+                                                           To="0" Duration="0:0:0.2"/>
+                                            <ColorAnimation Storyboard.TargetName="circle" 
+                                                          Storyboard.TargetProperty="(Ellipse.Fill).(SolidColorBrush.Color)" 
+                                                          To="{StaticResource LightPurple}" Duration="0:0:0.2"/>
+                                            <DoubleAnimation Storyboard.TargetName="shadow" 
+                                                           Storyboard.TargetProperty="BlurRadius" 
+                                                           To="15" Duration="0:0:0.2"/>
+                                            <DoubleAnimation Storyboard.TargetName="shadow" 
+                                                           Storyboard.TargetProperty="Opacity" 
+                                                           To="0.5" Duration="0:0:0.2"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -236,8 +281,9 @@
                 <!-- Title (Centered) -->
                 <TextBlock Grid.Column="1" 
                            Text="Monitor Layout Manager" 
-                           FontSize="20" 
-                           FontWeight="SemiBold" 
+                           FontSize="18" 
+                           FontWeight="Light" 
+                           FontFamily="Segoe UI"
                            Foreground="White"
                            HorizontalAlignment="Center" 
                            VerticalAlignment="Center"
@@ -273,38 +319,19 @@
                 </StackPanel>
             </Grid>
 
-            <!-- Carousel Section -->
-            <Grid Grid.Row="1" VerticalAlignment="Center">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="50"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="50"/>
-                </Grid.ColumnDefinitions>
-
-                <!-- Left Arrow -->
-                <Button x:Name="BtnScrollLeft"
-                        Grid.Column="0" 
-                        Style="{StaticResource NavArrow}"
-                        Click="ScrollLeft_Click"
-                        HorizontalAlignment="Center">
-                    <Button.Resources>
-                        <Style TargetType="Border">
-                            <Setter Property="CornerRadius" Value="25"/>
-                        </Style>
-                    </Button.Resources>
-                    <TextBlock Text="‹" FontSize="22" FontWeight="Bold" Margin="0,-2,2,0"/>
-                </Button>
-
+            <!-- Carousel Section (Scroll with mouse wheel, no navigation buttons) -->
+            <Grid Grid.Row="1" VerticalAlignment="Center" Margin="0,-40,0,0">
                 <!-- Profile Cards -->
                 <ScrollViewer x:Name="CarouselScroll"
-                              Grid.Column="1" 
                               HorizontalScrollBarVisibility="Hidden" 
                               VerticalScrollBarVisibility="Disabled"
                               PanningMode="HorizontalOnly"
+                              HorizontalContentAlignment="Center"
                               Loaded="CarouselScroll_Loaded"
                               ScrollChanged="CarouselScroll_ScrollChanged"
-                              SizeChanged="CarouselScroll_SizeChanged">
-                    <ItemsControl ItemsSource="{Binding Profiles}">
+                              SizeChanged="CarouselScroll_SizeChanged"
+                              PreviewMouseWheel="CarouselScroll_PreviewMouseWheel">
+                    <ItemsControl ItemsSource="{Binding Profiles}" HorizontalAlignment="Center">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"/>
@@ -435,11 +462,12 @@
                                                     Margin="0,0,0,20"
                                                     Opacity="0">
                                             
-                                            <!-- Activar Button (Centered, Rounded) -->
+                                            <!-- Activar Button (Centered, Rounded) - Hidden when profile is active -->
                                             <Button Content="Activar" 
                                                     Style="{StaticResource CardButton}"
                                                     Width="100"
                                                     Height="36"
+                                                    Visibility="{Binding IsActive, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=Invert}"
                                                     Command="{Binding DataContext.ApplyCommand, 
                                                              RelativeSource={RelativeSource AncestorType=Window}}"
                                                     CommandParameter="{Binding}">
@@ -456,6 +484,13 @@
                                                     </ControlTemplate>
                                                 </Button.Template>
                                             </Button>
+                                            
+                                            <!-- "Activo" Label - Shown when profile is active -->
+                                            <TextBlock Text="✓ Activo" 
+                                                       Foreground="#7F5AF0"
+                                                       FontWeight="SemiBold"
+                                                       FontSize="14"
+                                                       Visibility="{Binding IsActive, Converter={StaticResource BoolToVisibilityConverter}}"/>
                                         </StackPanel>
 
                                         <!-- Top Actions Stack (Edit + Delete) -->
@@ -466,11 +501,7 @@
                                                     Margin="8"
                                                     Opacity="0">
                                             
-                                            <!-- Edit Button Removed -->
-                                            
-                                            <!-- Delete Button (Right) -->
-
-                                            <!-- Delete Button (Right) -->
+                                            <!-- Delete Button -->
                                             <Button Width="24" Height="24"
                                                     ToolTip="Eliminar"
                                                     Command="{Binding DataContext.DeleteCommand, 
@@ -521,16 +552,8 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </ScrollViewer>
-
-                <!-- Right Arrow -->
-                <Button x:Name="BtnScrollRight"
-                        Grid.Column="2" 
-                        Style="{StaticResource NavArrow}"
-                        Click="ScrollRight_Click"
-                        HorizontalAlignment="Center">
-                    <TextBlock Text="›" FontSize="22" FontWeight="Bold" Margin="2,-2,0,0"/>
-                </Button>
             </Grid>
+
 
             <!-- Empty State -->
             <StackPanel Grid.Row="1" 
@@ -554,12 +577,12 @@
             </StackPanel>
         </Grid>
 
-        <!-- Floating Action Button (NEW POSITION) -->
+        <!-- Floating Action Button (CENTERED) -->
         <Button x:Name="BtnAddProfile"
                 Grid.Row="1"
                 Width="48" Height="48"
-                HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                Margin="0,0,30,30"
+                HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                Margin="0,0,0,30"
                 Style="{StaticResource AddProfileFAB}"
                 Command="{Binding OpenPanelCommand}">
             <Button.Effect>

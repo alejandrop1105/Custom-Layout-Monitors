@@ -85,6 +85,71 @@ namespace CustomLayoutMonitors.ViewModels
                 Profiles.Clear();
                 foreach (var p in loaded) Profiles.Add(p);
             }
+            
+            // Detect which profile matches current configuration
+            DetectActiveProfile();
+        }
+
+        private void DetectActiveProfile()
+        {
+            try
+            {
+                var currentProfile = _displayService.GetCurrentProfile("Current");
+                
+                foreach (var profile in Profiles)
+                {
+                    profile.IsActive = AreProfilesEqual(profile, currentProfile);
+                }
+            }
+            catch
+            {
+                // If detection fails, just leave all as inactive
+                foreach (var p in Profiles) p.IsActive = false;
+            }
+        }
+
+        private bool AreProfilesEqual(DisplayProfile a, DisplayProfile b)
+        {
+            if (a == null || b == null) return false;
+            if (a.Paths == null || b.Paths == null) return false;
+            if (a.Modes == null || b.Modes == null) return false;
+            if (a.Paths.Count != b.Paths.Count) return false;
+            if (a.Modes.Count != b.Modes.Count) return false;
+
+            // Compare paths - check source and target positions
+            for (int i = 0; i < a.Paths.Count; i++)
+            {
+                var pathA = a.Paths[i];
+                var pathB = b.Paths[i];
+                
+                if (pathA.SourceInfo.id != pathB.SourceInfo.id) return false;
+                if (pathA.TargetInfo.id != pathB.TargetInfo.id) return false;
+                if (pathA.TargetInfo.rotation != pathB.TargetInfo.rotation) return false;
+            }
+
+            // Compare modes - check position and resolution
+            for (int i = 0; i < a.Modes.Count; i++)
+            {
+                var modeA = a.Modes[i];
+                var modeB = b.Modes[i];
+                
+                if (modeA.InfoType != modeB.InfoType) return false;
+                if (modeA.Id != modeB.Id) return false;
+                
+                // Compare source mode positions and resolutions
+                if (modeA.InfoType == 1) // Source Mode
+                {
+                    var srcA = modeA.ModeInfo.sourceMode;
+                    var srcB = modeB.ModeInfo.sourceMode;
+                    
+                    if (srcA.width != srcB.width) return false;
+                    if (srcA.height != srcB.height) return false;
+                    if (srcA.position.x != srcB.position.x) return false;
+                    if (srcA.position.y != srcB.position.y) return false;
+                }
+            }
+
+            return true;
         }
 
         private void SaveProfiles()

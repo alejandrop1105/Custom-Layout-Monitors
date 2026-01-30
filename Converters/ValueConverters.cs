@@ -87,6 +87,10 @@ namespace CustomLayoutMonitors.Converters
         {
             if (value is bool isVisible)
             {
+                // Support "Invert" parameter to reverse the logic
+                bool invert = parameter?.ToString()?.Equals("Invert", StringComparison.OrdinalIgnoreCase) == true;
+                if (invert) isVisible = !isVisible;
+                
                 return isVisible ? Visibility.Visible : Visibility.Collapsed;
             }
             return Visibility.Collapsed;
@@ -96,7 +100,9 @@ namespace CustomLayoutMonitors.Converters
         {
             if (value is Visibility visibility)
             {
-                return visibility == Visibility.Visible;
+                bool result = visibility == Visibility.Visible;
+                bool invert = parameter?.ToString()?.Equals("Invert", StringComparison.OrdinalIgnoreCase) == true;
+                return invert ? !result : result;
             }
             return false;
         }

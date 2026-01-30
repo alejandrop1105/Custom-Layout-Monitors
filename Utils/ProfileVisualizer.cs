@@ -187,8 +187,16 @@ namespace CustomLayoutMonitors.Utils
                     var prev = orderedItems[i - 1];
                     var curr = orderedItems[i];
                     
-                    // Target: overlap by 25% of the monitor width
-                    double overlapAmount = curr.Width * 0.25;
+                    // Determine overlap percentage based on orientation
+                    // Portrait monitors are narrower, so use less overlap to avoid excessive superposition
+                    bool bothPortrait = prev.Orientation == MonitorOrientation.Portrait && 
+                                        curr.Orientation == MonitorOrientation.Portrait;
+                    bool anyPortrait = prev.Orientation == MonitorOrientation.Portrait || 
+                                       curr.Orientation == MonitorOrientation.Portrait;
+                    
+                    // Use smaller overlap for portrait monitors
+                    double overlapPercent = bothPortrait ? 0.10 : (anyPortrait ? 0.15 : 0.25);
+                    double overlapAmount = curr.Width * overlapPercent;
                     double targetX = prev.X + prev.Width - overlapAmount;
                     double shift = curr.X - targetX;
                     

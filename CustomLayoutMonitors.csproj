@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Resource Include="Assets\app_icon.png" />
+    <Resource Include="Assets\tray_icon.png" />
     <Resource Include="Assets\fondo.png" />
     <Resource Include="Assets\bg_gradient.png" />
     <Resource Include="Assets\monitor_landscape.png" />
